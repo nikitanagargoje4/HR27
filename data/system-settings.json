@@ -1,0 +1,16 @@
+{
+  "organizationName": "HR Connect",
+  "organizationEmail": "admin@hrconnect.com",
+  "timeZone": "Asia/Kolkata",
+  "dateFormat": "DD/MM/YYYY",
+  "workingHours": {
+    "start": "09:00",
+    "end": "18:00"
+  },
+  "notifications": {
+    "email": true,
+    "push": true,
+    "attendance": true,
+    "leave": true
+  }
+}
