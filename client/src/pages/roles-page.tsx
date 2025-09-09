@@ -12,9 +12,8 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { Edit, Eye, Shield, ShieldCheck, Users, Search, TrendingUp, UserCheck, Lock, Settings, ChevronRight, Crown, Key, Sliders, ToggleLeft, ToggleRight } from "lucide-react";
+import { Edit, Eye, Shield, ShieldCheck, Users, Search, TrendingUp, UserCheck, Lock, Settings, ChevronRight, Crown, Key } from "lucide-react";
 import { motion } from "framer-motion";
-import { Slider } from "@/components/ui/slider";
 import { PERMISSIONS, DEFAULT_ROLE_PERMISSIONS } from "@/lib/permissions";
 
 type User = {
@@ -36,7 +35,6 @@ export default function RolesPage() {
   const [editingPermissions, setEditingPermissions] = useState<string[]>([]);
   const [editingRole, setEditingRole] = useState<string>("");
   const [searchQuery, setSearchQuery] = useState<string>("");
-  const [categorySliders, setCategorySliders] = useState<Record<string, number>>({});
 
   // Check if current user can edit (only admin)
   const canEdit = user?.role === "admin";
@@ -101,23 +99,6 @@ export default function RolesPage() {
     setEditingRole(user.role);
     setEditingPermissions(user.customPermissions || []);
     
-    // Initialize category sliders based on current permissions
-    const categoryPercentages: Record<string, number> = {};
-    const permissionsByCategory = PERMISSIONS.reduce((acc, perm) => {
-      if (!acc[perm.category]) acc[perm.category] = [];
-      acc[perm.category].push(perm);
-      return acc;
-    }, {} as Record<string, typeof PERMISSIONS>);
-    
-    Object.entries(permissionsByCategory).forEach(([category, perms]) => {
-      const defaultPerms = DEFAULT_ROLE_PERMISSIONS[user.role as keyof typeof DEFAULT_ROLE_PERMISSIONS] || [];
-      const grantedPerms = [...defaultPerms, ...(user.customPermissions || [])];
-      const categoryPerms = perms.map(p => p.id);
-      const grantedInCategory = categoryPerms.filter(p => grantedPerms.includes(p)).length;
-      categoryPercentages[category] = Math.round((grantedInCategory / categoryPerms.length) * 100);
-    });
-    
-    setCategorySliders(categoryPercentages);
   };
 
   const handleSavePermissions = () => {
@@ -147,44 +128,6 @@ export default function RolesPage() {
     });
   };
 
-  const handleCategorySlider = (category: string, value: number[]) => {
-    if (!canEdit) return;
-    
-    const sliderValue = value[0];
-    setCategorySliders(prev => ({ ...prev, [category]: sliderValue }));
-    
-    // Get permissions in this category
-    const categoryPermissions = PERMISSIONS.filter(p => p.category === category);
-    const defaultPerms = DEFAULT_ROLE_PERMISSIONS[editingRole as keyof typeof DEFAULT_ROLE_PERMISSIONS] || [];
-    
-    // Calculate how many permissions to grant based on slider
-    const permissionsToGrant = Math.round((sliderValue / 100) * categoryPermissions.length);
-    
-    // Sort permissions by priority (you can customize this logic)
-    const sortedPermissions = categoryPermissions.sort((a, b) => {
-      // Prioritize view permissions, then add, then edit, then delete
-      const priority = { 'view': 0, 'add': 1, 'edit': 2, 'delete': 3 };
-      const aPriority = Object.keys(priority).find(key => a.id.toLowerCase().includes(key)) || 'other';
-      const bPriority = Object.keys(priority).find(key => b.id.toLowerCase().includes(key)) || 'other';
-      return (priority[aPriority as keyof typeof priority] ?? 4) - (priority[bPriority as keyof typeof priority] ?? 4);
-    });
-    
-    // Update permissions based on slider value
-    setEditingPermissions(prev => {
-      // Remove all non-default permissions from this category
-      const withoutCategory = prev.filter(p => 
-        !categoryPermissions.some(cp => cp.id === p) || defaultPerms.includes(p)
-      );
-      
-      // Add permissions based on slider value (excluding defaults)
-      const permissionsToAdd = sortedPermissions
-        .slice(0, permissionsToGrant)
-        .filter(p => !defaultPerms.includes(p.id))
-        .map(p => p.id);
-      
-      return [...withoutCategory, ...permissionsToAdd];
-    });
-  };
 
   const getRoleBadgeVariant = (role: string) => {
     switch (role) {
@@ -446,7 +389,7 @@ export default function RolesPage() {
                                 </div>
 
                                 {selectedUser && (
-                                  <div className="flex-1 overflow-y-auto">
+                                  <div className="flex-1 overflow-y-auto max-h-[70vh]">
                                     <div className="p-8 space-y-8">
                                       {/* Role Selection Section */}
                                       <motion.div
@@ -594,46 +537,7 @@ export default function RolesPage() {
                                                       <p className="text-xs text-slate-500 font-medium">{perms.length} permissions</p>
                                                     </div>
                                                   </div>
-                                                  {canEdit && (
-                                                    <div className="flex items-center space-x-2">
-                                                      <Sliders className="w-4 h-4 text-teal-600" />
-                                                      <span className="text-xs font-medium text-slate-600">
-                                                        {categorySliders[category] || 0}%
-                                                      </span>
-                                                    </div>
-                                                  )}
-                                                </div>
-                                                
-                                                {/* Category Permission Slider */}
-                                                {canEdit && (
-                                                  <div className="mb-4 p-4 bg-white rounded-lg border border-slate-200">
-                                                    <div className="flex items-center justify-between mb-2">
-                                                      <label className="text-sm font-semibold text-slate-700">
-                                                        Permission Level
-                                                      </label>
-                                                      <div className="flex items-center space-x-2">
-                                                        <ToggleLeft className="w-4 h-4 text-slate-400" />
-                                                        <span className="text-sm font-bold text-teal-600 min-w-[3rem] text-center">
-                                                          {categorySliders[category] || 0}%
-                                                        </span>
-                                                        <ToggleRight className="w-4 h-4 text-teal-600" />
-                                                      </div>
-                                                    </div>
-                                                    <Slider
-                                                      value={[categorySliders[category] || 0]}
-                                                      onValueChange={(value) => handleCategorySlider(category, value)}
-                                                      max={100}
-                                                      step={25}
-                                                      className="w-full"
-                                                    />
-                                                    <div className="flex justify-between text-xs text-slate-500 mt-2">
-                                                      <span>None</span>
-                                                      <span>View</span>
-                                                      <span>Moderate</span>
-                                                      <span>Full</span>
-                                                    </div>
                                                   </div>
-                                                )}
                                                 <div className="space-y-3">
                                                   {perms.map(permission => {
                                                     const defaultPerms = DEFAULT_ROLE_PERMISSIONS[editingRole as keyof typeof DEFAULT_ROLE_PERMISSIONS] || [];
@@ -882,39 +786,7 @@ export default function RolesPage() {
                                                 <h4 className="font-bold text-slate-900">{category}</h4>
                                                 <Badge variant="outline" className="text-xs">{perms.length}</Badge>
                                               </div>
-                                              {canEdit && (
-                                                <div className="flex items-center space-x-1">
-                                                  <Sliders className="w-3 h-3 text-teal-600" />
-                                                  <span className="text-xs font-medium text-slate-600">
-                                                    {categorySliders[category] || 0}%
-                                                  </span>
-                                                </div>
-                                              )}
                                             </div>
-                                            
-                                            {/* Mobile Slider */}
-                                            {canEdit && (
-                                              <div className="mb-3 p-3 bg-white rounded border border-slate-200">
-                                                <div className="flex items-center justify-between mb-2">
-                                                  <span className="text-xs font-semibold text-slate-700">Level</span>
-                                                  <span className="text-xs font-bold text-teal-600">
-                                                    {categorySliders[category] || 0}%
-                                                  </span>
-                                                </div>
-                                                <Slider
-                                                  value={[categorySliders[category] || 0]}
-                                                  onValueChange={(value) => handleCategorySlider(category, value)}
-                                                  max={100}
-                                                  step={25}
-                                                  className="w-full"
-                                                />
-                                                <div className="flex justify-between text-xs text-slate-500 mt-1">
-                                                  <span>None</span>
-                                                  <span>View</span>
-                                                  <span>Full</span>
-                                                </div>
-                                              </div>
-                                            )}
                                             <div className="space-y-2">
                                               {perms.map(permission => {
                                                 const defaultPerms = DEFAULT_ROLE_PERMISSIONS[editingRole as keyof typeof DEFAULT_ROLE_PERMISSIONS] || [];

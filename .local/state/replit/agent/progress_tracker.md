@@ -36,3 +36,4 @@
 [x] 35. Fixed Update Employee Profile form display issue by correcting modal height and overflow settings for proper scrolling
 [x] 36. Resolved duplicate navigation bars and blank spaces in Update Employee Profile form by fixing layout, sticky positioning, and overflow settings
 [x] 37. Fixed hidden Next and Cancel buttons in Create New Employee form by restructuring layout with flexbox and proper button positioning
+[x] 38. Add scrollbar to Manage Access Permissions form and remove Permission Level sliders
