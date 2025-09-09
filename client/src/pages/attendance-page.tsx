@@ -572,17 +572,107 @@ export default function AttendancePage() {
           
           {/* All Attendance Tab (Admin/HR view) */}
           {user && (user.role === 'admin' || user.role === 'hr' || user.role === 'manager') && (
-            <TabsContent value="all-attendance">
-              <div className="space-y-6">
-                {/* Date selection and summary row */}
-                <div className="grid grid-cols-1 xl:grid-cols-5 gap-6">
+            <TabsContent value="all-attendance" className="space-y-0">
+              <div className="p-8">
+                {/* Team Overview Stats */}
+                <motion.div 
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: 0.1 }}
+                  className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-8"
+                >
+                  {/* Present Count Card */}
+                  <div className="bg-gradient-to-br from-emerald-50 to-emerald-100 border-2 border-emerald-200 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300">
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="bg-gradient-to-br from-emerald-500 to-emerald-600 p-3 rounded-xl shadow-sm">
+                        <CheckCircle2 className="w-6 h-6 text-white" />
+                      </div>
+                      <div className="text-right">
+                        <div className="text-3xl font-bold text-emerald-900">
+                          {allEmployeeAttendanceData.filter(a => a.status === 'present').length}
+                        </div>
+                        <div className="text-sm text-emerald-700 font-medium">Present Today</div>
+                      </div>
+                    </div>
+                    <div className="text-sm text-emerald-600 font-medium">
+                      {employees.length > 0 ? Math.round((allEmployeeAttendanceData.filter(a => a.status === 'present').length / employees.length) * 100) : 0}% attendance rate
+                    </div>
+                  </div>
+
+                  {/* Absent Count Card */}
+                  <div className="bg-gradient-to-br from-red-50 to-red-100 border-2 border-red-200 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300">
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="bg-gradient-to-br from-red-500 to-red-600 p-3 rounded-xl shadow-sm">
+                        <XCircle className="w-6 h-6 text-white" />
+                      </div>
+                      <div className="text-right">
+                        <div className="text-3xl font-bold text-red-900">
+                          {allEmployeeAttendanceData.filter(a => a.status === 'absent').length}
+                        </div>
+                        <div className="text-sm text-red-700 font-medium">Absent Today</div>
+                      </div>
+                    </div>
+                    <div className="text-sm text-red-600 font-medium">
+                      {employees.length > 0 ? Math.round((allEmployeeAttendanceData.filter(a => a.status === 'absent').length / employees.length) * 100) : 0}% absence rate
+                    </div>
+                  </div>
+
+                  {/* On Leave Count Card */}
+                  <div className="bg-gradient-to-br from-amber-50 to-amber-100 border-2 border-amber-200 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300">
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="bg-gradient-to-br from-amber-500 to-amber-600 p-3 rounded-xl shadow-sm">
+                        <CalendarIcon className="w-6 h-6 text-white" />
+                      </div>
+                      <div className="text-right">
+                        <div className="text-3xl font-bold text-amber-900">
+                          {allEmployeeAttendanceData.filter(a => a.status === 'on leave').length}
+                        </div>
+                        <div className="text-sm text-amber-700 font-medium">On Leave</div>
+                      </div>
+                    </div>
+                    <div className="text-sm text-amber-600 font-medium">
+                      Planned absences
+                    </div>
+                  </div>
+
+                  {/* Total Team Card */}
+                  <div className="bg-gradient-to-br from-blue-50 to-blue-100 border-2 border-blue-200 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300">
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="bg-gradient-to-br from-blue-500 to-blue-600 p-3 rounded-xl shadow-sm">
+                        <Users className="w-6 h-6 text-white" />
+                      </div>
+                      <div className="text-right">
+                        <div className="text-3xl font-bold text-blue-900">
+                          {employees.length}
+                        </div>
+                        <div className="text-sm text-blue-700 font-medium">Total Team</div>
+                      </div>
+                    </div>
+                    <div className="text-sm text-blue-600 font-medium">
+                      Active employees
+                    </div>
+                  </div>
+                </motion.div>
+
+                {/* Date Selection and Controls */}
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
                   {/* Date selection card */}
-                  <Card className="xl:col-span-2">
-                    <CardHeader className="pb-2">
-                      <CardTitle className="text-lg font-medium">Select Date</CardTitle>
-                      <CardDescription>View attendance for a specific date</CardDescription>
-                    </CardHeader>
-                    <CardContent className="flex justify-center">
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6, delay: 0.2 }}
+                    className="bg-white rounded-2xl border-2 border-slate-200 shadow-lg hover:shadow-xl transition-all duration-300"
+                  >
+                    <div className="bg-gradient-to-r from-slate-50 via-white to-slate-50 px-6 py-4 rounded-t-2xl border-b-2 border-slate-100">
+                      <h3 className="text-xl font-bold text-slate-900 flex items-center">
+                        <CalendarIcon className="w-5 h-5 mr-3 text-teal-600" />
+                        Select Date
+                      </h3>
+                      <p className="text-slate-600 text-sm mt-1 font-medium">
+                        View attendance for specific date
+                      </p>
+                    </div>
+                    <div className="p-6 flex justify-center">
                       <Calendar
                         mode="single"
                         selected={selectedDate}
@@ -595,76 +685,75 @@ export default function AttendancePage() {
                           return date > today;
                         }}
                       />
-                    </CardContent>
-                  </Card>
+                    </div>
+                  </motion.div>
                   
-                  {/* Attendance summary cards */}
-                  <div className="xl:col-span-3 grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <Card>
-                      <CardHeader className="pb-2">
-                        <div className="flex items-center space-x-2">
-                          <div className="p-2 rounded-full bg-green-100 text-green-600">
-                            <CheckCircle2 className="h-5 w-5" />
+                  {/* Quick Insights Cards */}
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6, delay: 0.3 }}
+                    className="lg:col-span-2 space-y-6"
+                  >
+                    {/* Date Display Card */}
+                    <div className="bg-white rounded-2xl border-2 border-slate-200 shadow-lg hover:shadow-xl transition-all duration-300 p-6">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <h4 className="text-2xl font-bold text-slate-900">
+                            {format(selectedDate, 'EEEE, MMMM dd, yyyy')}
+                          </h4>
+                          <p className="text-slate-600 font-medium mt-1">
+                            Attendance overview for selected date
+                          </p>
+                        </div>
+                        <div className="bg-gradient-to-br from-teal-100 to-emerald-100 p-4 rounded-xl shadow-sm">
+                          <BarChart3 className="w-8 h-8 text-teal-700" />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Performance Summary */}
+                    <div className="bg-white rounded-2xl border-2 border-slate-200 shadow-lg hover:shadow-xl transition-all duration-300 p-6">
+                      <h4 className="text-lg font-bold text-slate-900 mb-4 flex items-center">
+                        <TrendingUp className="w-5 h-5 mr-3 text-teal-600" />
+                        Team Performance
+                      </h4>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="text-center">
+                          <div className="text-2xl font-bold text-emerald-600">
+                            {employees.length > 0 ? Math.round((allEmployeeAttendanceData.filter(a => a.status === 'present').length / employees.length) * 100) : 0}%
                           </div>
-                          <CardTitle className="text-lg font-medium">Present</CardTitle>
+                          <div className="text-sm text-slate-600 font-medium">Attendance Rate</div>
                         </div>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="text-3xl font-bold">
-                          {allEmployeeAttendanceData.filter(a => a.status === 'present').length}
-                        </div>
-                        <p className="text-sm text-slate-500">of {employees.length} employees</p>
-                      </CardContent>
-                    </Card>
-                  
-                    <Card>
-                      <CardHeader className="pb-2">
-                        <div className="flex items-center space-x-2">
-                          <div className="p-2 rounded-full bg-red-100 text-red-600">
-                            <XCircle className="h-5 w-5" />
+                        <div className="text-center">
+                          <div className="text-2xl font-bold text-blue-600">
+                            {allEmployeeAttendanceData.filter(a => a.checkInTime).length}
                           </div>
-                          <CardTitle className="text-lg font-medium">Absent</CardTitle>
+                          <div className="text-sm text-slate-600 font-medium">Checked In</div>
                         </div>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="text-3xl font-bold">
-                          {allEmployeeAttendanceData.filter(a => a.status === 'absent').length}
-                        </div>
-                        <p className="text-sm text-slate-500">of {employees.length} employees</p>
-                      </CardContent>
-                    </Card>
-                    
-                    <Card>
-                      <CardHeader className="pb-2">
-                        <div className="flex items-center space-x-2">
-                          <div className="p-2 rounded-full bg-amber-100 text-amber-600">
-                            <CalendarIcon className="h-5 w-5" />
-                          </div>
-                          <CardTitle className="text-lg font-medium">On Leave</CardTitle>
-                        </div>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="text-3xl font-bold">
-                          {allEmployeeAttendanceData.filter(a => a.status === 'on leave').length}
-                        </div>
-                        <p className="text-sm text-slate-500">of {employees.length} employees</p>
-                      </CardContent>
-                    </Card>
-                  </div>
+                      </div>
+                    </div>
+                  </motion.div>
                 </div>
                 
                 
                 {/* Attendance records table */}
-                <Card className="w-full">
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-lg font-medium">
-                      Attendance Records for {format(selectedDate, 'MMMM dd, yyyy')}
-                    </CardTitle>
-                    <CardDescription>
-                      All employee attendance records for the selected date
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: 0.4 }}
+                  className="bg-white rounded-2xl border-2 border-slate-200 shadow-lg hover:shadow-xl transition-all duration-300"
+                >
+                  <div className="bg-gradient-to-r from-slate-50 via-white to-slate-50 px-6 py-4 rounded-t-2xl border-b-2 border-slate-100">
+                    <h3 className="text-xl font-bold text-slate-900 flex items-center">
+                      <Users className="w-5 h-5 mr-3 text-teal-600" />
+                      Team Attendance Records
+                    </h3>
+                    <p className="text-slate-600 text-sm mt-1 font-medium">
+                      Detailed attendance data for {format(selectedDate, 'MMMM dd, yyyy')}
+                    </p>
+                  </div>
+                  <div className="p-6">
                     {isLoadingDateAttendance ? (
                       <div className="flex justify-center items-center py-8">
                         <div className="text-slate-600">Loading attendance records...</div>
@@ -684,8 +773,8 @@ export default function AttendancePage() {
                         </div>
                       </div>
                     )}
-                  </CardContent>
-                </Card>
+                  </div>
+                </motion.div>
               </div>
             </TabsContent>
           )}
