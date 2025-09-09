@@ -149,7 +149,8 @@
       "bankIFSCCode": "12345456",
       "bankAccountType": "current",
       "id": 15,
-      "isActive": true
+      "isActive": true,
+      "customPermissions": []
     },
     {
       "firstName": "Nikita",
@@ -174,12 +175,7 @@
       "id": 16,
       "isActive": true,
       "gender": "female",
-      "customPermissions": [
-        "employees.view",
-        "employees.edit",
-        "employees.create",
-        "employees.delete"
-      ]
+      "customPermissions": []
     }
   ],
   "departments": [
@@ -2645,6 +2641,17 @@
       "createdAt": "2025-09-09T08:02:15.260Z",
       "relatedUserId": null,
       "relatedLeaveId": null
+    },
+    {
+      "userId": 1,
+      "type": "login",
+      "title": "Successful Login",
+      "message": "You have successfully logged in at 9/9/2025",
+      "isRead": true,
+      "id": 155,
+      "createdAt": "2025-09-09T08:15:48.139Z",
+      "relatedUserId": null,
+      "relatedLeaveId": null
     }
   ],
   "currentUserId": 17,
@@ -2652,7 +2659,7 @@
   "currentAttendanceId": 19,
   "currentLeaveRequestId": 22,
   "currentHolidayId": 63,
-  "currentNotificationId": 155,
+  "currentNotificationId": 156,
   "paymentRecords": [
     {
       "employeeId": 1,
