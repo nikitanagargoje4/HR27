@@ -109,6 +109,30 @@ export default function AttendancePage() {
     },
   });
   
+  // Mutation for creating new attendance
+  const createAttendanceMutation = useMutation({
+    mutationFn: async (attendanceData: any) => {
+      return apiRequest('POST', '/api/attendance', attendanceData);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/attendance"] });
+      toast({
+        title: "Success",
+        description: "Attendance record created successfully",
+      });
+      setIsEditDialogOpen(false);
+      setEditingRecord(null);
+      form.reset();
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to create attendance record",
+        variant: "destructive",
+      });
+    },
+  });
+  
   // Check if user has checked in today
   const todayRecord = myAttendance.find(record => 
     (record.date && isToday(new Date(record.date))) || 
@@ -172,8 +196,19 @@ export default function AttendancePage() {
   };
   
   // Handle edit attendance
-  const handleEditAttendance = (attendance: Attendance) => {
-    setEditingRecord(attendance);
+  const handleEditAttendance = (attendance: any) => {
+    // If this is a synthetic record (ID 0), we need to handle it differently
+    if (attendance.id === 0) {
+      // Create a new attendance record structure
+      const newRecord = {
+        ...attendance,
+        id: null, // This will trigger creation instead of update
+      };
+      setEditingRecord(newRecord);
+    } else {
+      setEditingRecord(attendance);
+    }
+    
     // Format times for the form inputs
     const checkInTime = attendance.checkInTime ? format(new Date(attendance.checkInTime), 'HH:mm') : '';
     const checkOutTime = attendance.checkOutTime ? format(new Date(attendance.checkOutTime), 'HH:mm') : '';
@@ -191,11 +226,16 @@ export default function AttendancePage() {
     
     const attendanceData: any = {};
     
+    // Set the user ID and date for new records
+    if (editingRecord.id === null || editingRecord.id === 0) {
+      attendanceData.userId = editingRecord.userId;
+      attendanceData.date = format(selectedDate, 'yyyy-MM-dd');
+    }
+    
     // Update check-in time if provided
     if (data.checkInTime) {
       const [hours, minutes] = data.checkInTime.split(':');
-      const baseDate = editingRecord.date ? new Date(editingRecord.date) : 
-                       editingRecord.checkInTime ? new Date(editingRecord.checkInTime) : new Date();
+      const baseDate = selectedDate;
       const checkInDate = new Date(baseDate);
       checkInDate.setHours(parseInt(hours), parseInt(minutes), 0, 0);
       attendanceData.checkInTime = checkInDate.toISOString();
@@ -204,17 +244,23 @@ export default function AttendancePage() {
     // Update check-out time if provided
     if (data.checkOutTime) {
       const [hours, minutes] = data.checkOutTime.split(':');
-      const baseDate = editingRecord.date ? new Date(editingRecord.date) : 
-                       editingRecord.checkInTime ? new Date(editingRecord.checkInTime) : new Date();
+      const baseDate = selectedDate;
       const checkOutDate = new Date(baseDate);
       checkOutDate.setHours(parseInt(hours), parseInt(minutes), 0, 0);
       attendanceData.checkOutTime = checkOutDate.toISOString();
     }
     
-    updateAttendanceMutation.mutate({
-      id: editingRecord.id,
-      attendanceData,
-    });
+    // If this is a new record, create it instead of updating
+    if (editingRecord.id === null || editingRecord.id === 0) {
+      // Use POST for new records
+      createAttendanceMutation.mutate(attendanceData);
+    } else {
+      // Use PUT for existing records
+      updateAttendanceMutation.mutate({
+        id: editingRecord.id,
+        attendanceData,
+      });
+    }
   };
   
   // Define table columns for personal attendance
