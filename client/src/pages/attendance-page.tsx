@@ -14,7 +14,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { 
-  Clock, Calendar as CalendarIcon, CheckCircle2, XCircle 
+  Clock, Calendar as CalendarIcon, CheckCircle2, XCircle, Users, TrendingUp, MapPin, Timer, CheckSquare, AlertCircle, UserCheck, BarChart3, Activity, Target, Clock4, ClockIcon, Building2
 } from "lucide-react";
 import { FaEdit } from "react-icons/fa";
 import { Attendance, User, LeaveRequest, insertAttendanceSchema } from "@shared/schema";
@@ -25,6 +25,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { motion } from "framer-motion";
 
 // Edit form schema
 const editAttendanceSchema = z.object({
@@ -296,81 +297,195 @@ export default function AttendancePage() {
 
   return (
     <AppLayout>
-      <div className="space-y-6">
-        <div className="flex justify-between items-center">
-          <h1 className="text-2xl font-semibold text-slate-900">Attendance</h1>
-          {/* Only show check in/out buttons if user is an employee */}
-          {user && <CheckButton currentAttendance={todayRecord} />}
-        </div>
-        
-        <Tabs defaultValue="my-attendance">
-          <TabsList>
-            <TabsTrigger value="my-attendance">My Attendance</TabsTrigger>
-            {user && (user.role === 'admin' || user.role === 'hr' || user.role === 'manager') && (
-              <TabsTrigger value="all-attendance">All Attendance</TabsTrigger>
-            )}
-          </TabsList>
-          
-          {/* My Attendance Tab */}
-          <TabsContent value="my-attendance">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {/* Today's status card */}
-              <Card>
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-lg font-medium">Today's Status</CardTitle>
-                  <CardDescription>{format(new Date(), 'EEEE, MMMM dd, yyyy')}</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex flex-col space-y-4">
-                    <div className="flex justify-between items-center">
-                      <div className="flex items-center text-slate-600">
-                        <Clock className="mr-2 h-4 w-4" />
-                        <span>Check In:</span>
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50">
+        {/* Executive Header */}
+        <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-r from-teal-600/20 via-emerald-600/20 to-blue-600/20"></div>
+          <div className="relative px-6 py-12">
+            <div className="max-w-7xl mx-auto">
+              <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6 }}
+                className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6"
+              >
+                <div className="flex items-center space-x-6">
+                  <div className="bg-gradient-to-br from-teal-500 to-emerald-600 p-4 rounded-2xl shadow-xl">
+                    <Clock4 className="w-8 h-8 text-white" />
+                  </div>
+                  <div>
+                    <h1 className="text-4xl font-bold bg-gradient-to-r from-white to-slate-200 bg-clip-text text-transparent mb-2">
+                      Attendance Management
+                    </h1>
+                    <p className="text-slate-300 text-lg max-w-2xl">
+                      Monitor team presence and productivity with real-time insights
+                    </p>
+                  </div>
+                </div>
+                
+                <div className="flex flex-wrap gap-4">
+                  <div className="bg-white/10 backdrop-blur-sm rounded-xl px-6 py-4 border border-white/20">
+                    <div className="flex items-center space-x-3">
+                      <Activity className="w-6 h-6 text-emerald-400" />
+                      <div>
+                        <div className="text-sm font-medium text-slate-300">Today's Status</div>
+                        <div className="text-2xl font-bold text-white">
+                          {todayRecord?.status === 'present' ? 'Present' : 'Not Checked In'}
+                        </div>
                       </div>
-                      <div className="font-medium">
-                        {todayRecord?.checkInTime 
-                          ? format(new Date(todayRecord.checkInTime), 'hh:mm a') 
-                          : 'Not checked in'}
-                      </div>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <div className="flex items-center text-slate-600">
-                        <Clock className="mr-2 h-4 w-4" />
-                        <span>Check Out:</span>
-                      </div>
-                      <div className="font-medium">
-                        {todayRecord?.checkOutTime 
-                          ? format(new Date(todayRecord.checkOutTime), 'hh:mm a') 
-                          : 'Not checked out'}
-                      </div>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <div className="flex items-center text-slate-600">
-                        {todayRecord?.status === 'present' 
-                          ? <CheckCircle2 className="mr-2 h-4 w-4 text-green-500" /> 
-                          : <XCircle className="mr-2 h-4 w-4 text-red-500" />}
-                        <span>Status:</span>
-                      </div>
-                      <Badge variant={todayRecord?.status === 'present' ? 'default' : 'destructive'} className="capitalize">
-                        {todayRecord?.status || 'Not Recorded'}
-                      </Badge>
                     </div>
                   </div>
-                </CardContent>
-              </Card>
+                  {user && <CheckButton currentAttendance={todayRecord} />}
+                </div>
+              </motion.div>
+            </div>
+          </div>
+        </div>
+
+        <div className="max-w-7xl mx-auto px-6 py-8">
+        
+        <Tabs defaultValue="my-attendance" className="w-full">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            className="bg-white rounded-2xl border-2 border-slate-200 shadow-xl hover:shadow-2xl transition-all duration-300 mb-8"
+          >
+            <div className="bg-gradient-to-r from-slate-50 via-white to-slate-50 px-8 py-6 rounded-t-2xl border-b-2 border-slate-100">
+              <TabsList className="bg-slate-100 p-1 rounded-xl w-full lg:w-auto">
+                <TabsTrigger value="my-attendance" className="flex-1 lg:flex-none data-[state=active]:bg-white data-[state=active]:text-teal-700 data-[state=active]:shadow-sm font-medium transition-all duration-200">
+                  <UserCheck className="w-4 h-4 mr-2" />
+                  My Attendance
+                </TabsTrigger>
+                {user && (user.role === 'admin' || user.role === 'hr' || user.role === 'manager') && (
+                  <TabsTrigger value="all-attendance" className="flex-1 lg:flex-none data-[state=active]:bg-white data-[state=active]:text-teal-700 data-[state=active]:shadow-sm font-medium transition-all duration-200">
+                    <BarChart3 className="w-4 h-4 mr-2" />
+                    Team Overview
+                  </TabsTrigger>
+                )}
+              </TabsList>
+            </div>
+          </motion.div>
+          
+          {/* My Attendance Tab */}
+          <TabsContent value="my-attendance" className="space-y-0">
+            <div className="p-8">
+              {/* Personal Stats Grid */}
+              <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.1 }}
+                className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-8"
+              >
+                {/* Today's Status Card */}
+                <div className="bg-gradient-to-br from-white to-slate-50 border-2 border-slate-200 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="bg-gradient-to-br from-teal-100 to-emerald-100 p-3 rounded-xl shadow-sm">
+                      <Target className="w-6 h-6 text-teal-700" />
+                    </div>
+                    <div className="text-right">
+                      <div className="text-2xl font-bold text-slate-900">
+                        {todayRecord?.status === 'present' ? 'Present' : 'Absent'}
+                      </div>
+                      <div className="text-sm text-slate-500 font-medium">Today's Status</div>
+                    </div>
+                  </div>
+                  <div className="text-sm text-slate-600 font-medium">
+                    {format(new Date(), 'EEEE, MMMM dd, yyyy')}
+                  </div>
+                </div>
+
+                {/* Check In Time Card */}
+                <div className="bg-gradient-to-br from-white to-slate-50 border-2 border-slate-200 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="bg-gradient-to-br from-emerald-100 to-green-100 p-3 rounded-xl shadow-sm">
+                      <ClockIcon className="w-6 h-6 text-emerald-700" />
+                    </div>
+                    <div className="text-right">
+                      <div className="text-2xl font-bold text-slate-900">
+                        {todayRecord?.checkInTime 
+                          ? format(new Date(todayRecord.checkInTime), 'HH:mm') 
+                          : '--:--'}
+                      </div>
+                      <div className="text-sm text-slate-500 font-medium">Check In Time</div>
+                    </div>
+                  </div>
+                  <div className="text-sm text-slate-600 font-medium">
+                    {todayRecord?.checkInTime ? 'On Time' : 'Not checked in'}
+                  </div>
+                </div>
+
+                {/* Check Out Time Card */}
+                <div className="bg-gradient-to-br from-white to-slate-50 border-2 border-slate-200 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="bg-gradient-to-br from-blue-100 to-cyan-100 p-3 rounded-xl shadow-sm">
+                      <Timer className="w-6 h-6 text-blue-700" />
+                    </div>
+                    <div className="text-right">
+                      <div className="text-2xl font-bold text-slate-900">
+                        {todayRecord?.checkOutTime 
+                          ? format(new Date(todayRecord.checkOutTime), 'HH:mm') 
+                          : '--:--'}
+                      </div>
+                      <div className="text-sm text-slate-500 font-medium">Check Out Time</div>
+                    </div>
+                  </div>
+                  <div className="text-sm text-slate-600 font-medium">
+                    {todayRecord?.checkOutTime ? 'Completed' : 'Still working'}
+                  </div>
+                </div>
+
+                {/* Work Hours Card */}
+                <div className="bg-gradient-to-br from-white to-slate-50 border-2 border-slate-200 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="bg-gradient-to-br from-purple-100 to-pink-100 p-3 rounded-xl shadow-sm">
+                      <Clock className="w-6 h-6 text-purple-700" />
+                    </div>
+                    <div className="text-right">
+                      <div className="text-2xl font-bold text-slate-900">
+                        {todayRecord?.checkInTime && todayRecord?.checkOutTime 
+                          ? (() => {
+                              const start = new Date(todayRecord.checkInTime);
+                              const end = new Date(todayRecord.checkOutTime);
+                              const diff = (end.getTime() - start.getTime()) / (1000 * 60 * 60);
+                              return `${diff.toFixed(1)}h`;
+                            })()
+                          : '--.-h'}
+                      </div>
+                      <div className="text-sm text-slate-500 font-medium">Work Hours</div>
+                    </div>
+                  </div>
+                  <div className="text-sm text-slate-600 font-medium">
+                    {todayRecord?.checkInTime && todayRecord?.checkOutTime ? 'Completed' : 'In progress'}
+                  </div>
+                </div>
+              </motion.div>
+
+              {/* Main Content Grid */}
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
               
               {/* Calendar card */}
-              <Card className="md:col-span-2">
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-lg font-medium">Attendance Calendar</CardTitle>
-                  <CardDescription>View your attendance history</CardDescription>
-                </CardHeader>
-                <CardContent>
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.3 }}
+                className="lg:col-span-2 bg-white rounded-2xl border-2 border-slate-200 shadow-lg hover:shadow-xl transition-all duration-300"
+              >
+                <div className="bg-gradient-to-r from-slate-50 via-white to-slate-50 px-6 py-4 rounded-t-2xl border-b-2 border-slate-100">
+                  <h3 className="text-xl font-bold text-slate-900 flex items-center">
+                    <CalendarIcon className="w-5 h-5 mr-3 text-teal-600" />
+                    Attendance Calendar
+                  </h3>
+                  <p className="text-slate-600 text-sm mt-1 font-medium">
+                    View your attendance history and patterns
+                  </p>
+                </div>
+                <div className="p-6">
                   <Calendar
                     mode="single"
                     selected={selectedDate}
                     onSelect={(date) => date && setSelectedDate(date)}
-                    className="w-full"
+                    className="w-full mx-auto"
                     disabled={(date) => {
                       const today = new Date();
                       today.setHours(0, 0, 0, 0);
@@ -379,16 +494,69 @@ export default function AttendancePage() {
                       return compareDate.getTime() !== today.getTime();
                     }}
                   />
-                </CardContent>
-              </Card>
+                </div>
+              </motion.div>
+              
+              {/* Recent Activity */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.4 }}
+                className="bg-white rounded-2xl border-2 border-slate-200 shadow-lg hover:shadow-xl transition-all duration-300"
+              >
+                <div className="bg-gradient-to-r from-slate-50 via-white to-slate-50 px-6 py-4 rounded-t-2xl border-b-2 border-slate-100">
+                  <h3 className="text-xl font-bold text-slate-900 flex items-center">
+                    <Activity className="w-5 h-5 mr-3 text-teal-600" />
+                    Recent Activity
+                  </h3>
+                  <p className="text-slate-600 text-sm mt-1 font-medium">
+                    Your latest check-ins and work patterns
+                  </p>
+                </div>
+                <div className="p-6">
+                  <div className="space-y-4">
+                    {myAttendance.slice(0, 5).map((record, index) => (
+                      <div key={record.id} className="flex items-center justify-between p-4 rounded-xl bg-gradient-to-br from-slate-50 to-white border border-slate-200 hover:shadow-md transition-all duration-200">
+                        <div className="flex items-center space-x-4">
+                          <div className={`w-3 h-3 rounded-full ${
+                            record.status === 'present' ? 'bg-emerald-500' : 'bg-red-500'
+                          } animate-pulse`}></div>
+                          <div>
+                            <div className="font-semibold text-slate-900">
+                              {record.date ? format(new Date(record.date), 'MMM dd, yyyy') : 'Today'}
+                            </div>
+                            <div className="text-sm text-slate-500">
+                              {record.checkInTime ? format(new Date(record.checkInTime), 'hh:mm a') : 'No record'}
+                            </div>
+                          </div>
+                        </div>
+                        <Badge variant={record.status === 'present' ? 'default' : 'destructive'} className="capitalize font-medium">
+                          {record.status || 'Absent'}
+                        </Badge>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </motion.div>
+              </div>
               
               {/* Attendance history table */}
-              <Card className="md:col-span-3">
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-lg font-medium">Attendance History</CardTitle>
-                  <CardDescription>Your past attendance records</CardDescription>
-                </CardHeader>
-                <CardContent>
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.5 }}
+                className="bg-white rounded-2xl border-2 border-slate-200 shadow-lg hover:shadow-xl transition-all duration-300 mt-8"
+              >
+                <div className="bg-gradient-to-r from-slate-50 via-white to-slate-50 px-6 py-4 rounded-t-2xl border-b-2 border-slate-100">
+                  <h3 className="text-xl font-bold text-slate-900 flex items-center">
+                    <BarChart3 className="w-5 h-5 mr-3 text-teal-600" />
+                    Complete Attendance History
+                  </h3>
+                  <p className="text-slate-600 text-sm mt-1 font-medium">
+                    Detailed view of all your attendance records
+                  </p>
+                </div>
+                <div className="p-6">
                   <DataTable
                     columns={personalColumns}
                     data={myAttendance.sort((a, b) => {
@@ -397,8 +565,8 @@ export default function AttendancePage() {
                       return dateB - dateA;
                     })}
                   />
-                </CardContent>
-              </Card>
+                </div>
+              </motion.div>
             </div>
           </TabsContent>
           
@@ -596,6 +764,7 @@ export default function AttendancePage() {
             </Form>
           </DialogContent>
         </Dialog>
+        </div>
       </div>
     </AppLayout>
   );
