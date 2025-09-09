@@ -95,13 +95,14 @@ export function CheckButton({ currentAttendance }: CheckButtonProps) {
       {canCheckIn ? (
         <Button 
           onClick={handleCheckIn}
-          className="bg-green-500 hover:bg-green-600 text-white"
+          className="bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 text-white shadow-lg hover:shadow-xl transition-all duration-200 font-semibold px-6 py-3 border-0"
           disabled={checkInMutation.isPending}
+          size="lg"
         >
           {checkInMutation.isPending ? (
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            <Loader2 className="mr-3 h-5 w-5 animate-spin" />
           ) : (
-            <LogIn className="mr-2 h-4 w-4" />
+            <LogIn className="mr-3 h-5 w-5" />
           )}
           Check In
         </Button>
@@ -109,13 +110,14 @@ export function CheckButton({ currentAttendance }: CheckButtonProps) {
         <Button 
           onClick={handleCheckOut}
           variant="outline"
-          className="border-red-500 text-red-600 hover:bg-red-50"
+          className="border-2 border-red-500 text-red-600 hover:bg-red-50 hover:border-red-600 shadow-lg hover:shadow-xl transition-all duration-200 font-semibold px-6 py-3 bg-white"
           disabled={checkOutMutation.isPending || isCheckedOut}
+          size="lg"
         >
           {checkOutMutation.isPending ? (
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            <Loader2 className="mr-3 h-5 w-5 animate-spin" />
           ) : (
-            <LogOut className="mr-2 h-4 w-4" />
+            <LogOut className="mr-3 h-5 w-5" />
           )}
           {isCheckedOut ? "Checked Out" : "Check Out"}
         </Button>
