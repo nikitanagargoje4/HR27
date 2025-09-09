@@ -14,7 +14,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { 
-  Clock, Calendar as CalendarIcon, CheckCircle2, XCircle, Users, TrendingUp, MapPin, Timer, CheckSquare, AlertCircle, UserCheck, BarChart3, Activity, Target, Clock4, ClockIcon, Building2
+  Clock, Calendar as CalendarIcon, CheckCircle2, XCircle, Users, TrendingUp, MapPin, Timer, CheckSquare, AlertCircle, UserCheck, BarChart3, Activity, Target, Clock4, ClockIcon, Building2, LogIn, LogOut, Loader2
 } from "lucide-react";
 import { FaEdit } from "react-icons/fa";
 import { Attendance, User, LeaveRequest, insertAttendanceSchema } from "@shared/schema";
@@ -840,43 +840,61 @@ export default function AttendancePage() {
             
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                {/* Check In Time */}
                 <FormField
                   control={form.control}
                   name="checkInTime"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Check In Time</FormLabel>
+                      <FormLabel className="text-base font-semibold text-slate-700 flex items-center">
+                        <LogIn className="w-4 h-4 mr-2 text-emerald-600" />
+                        Check In Time
+                      </FormLabel>
                       <FormControl>
-                        <Input
-                          type="time"
-                          {...field}
-                          className="w-full"
-                        />
+                        <div className="relative">
+                          <Input
+                            type="time"
+                            {...field}
+                            className="h-14 text-lg border-2 border-slate-200 focus:border-teal-500 focus:ring-2 focus:ring-teal-100 rounded-xl font-medium transition-all duration-200 pl-12"
+                          />
+                          <div className="absolute left-4 top-1/2 transform -translate-y-1/2">
+                            <Clock className="w-5 h-5 text-slate-400" />
+                          </div>
+                        </div>
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
                 
+                {/* Check Out Time */}
                 <FormField
                   control={form.control}
                   name="checkOutTime"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Check Out Time</FormLabel>
+                      <FormLabel className="text-base font-semibold text-slate-700 flex items-center">
+                        <LogOut className="w-4 h-4 mr-2 text-red-600" />
+                        Check Out Time
+                      </FormLabel>
                       <FormControl>
-                        <Input
-                          type="time"
-                          {...field}
-                          className="w-full"
-                        />
+                        <div className="relative">
+                          <Input
+                            type="time"
+                            {...field}
+                            className="h-14 text-lg border-2 border-slate-200 focus:border-teal-500 focus:ring-2 focus:ring-teal-100 rounded-xl font-medium transition-all duration-200 pl-12"
+                          />
+                          <div className="absolute left-4 top-1/2 transform -translate-y-1/2">
+                            <Clock className="w-5 h-5 text-slate-400" />
+                          </div>
+                        </div>
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
                 
-                <DialogFooter className="gap-2">
+                <div className="flex flex-col sm:flex-row sm:justify-end gap-4 pt-6">
                   <Button
                     type="button"
                     variant="outline"
@@ -885,16 +903,28 @@ export default function AttendancePage() {
                       setEditingRecord(null);
                       form.reset();
                     }}
+                    className="w-full sm:w-auto h-12 border-2 border-slate-300 hover:border-slate-400 font-semibold text-slate-700 transition-all duration-200 rounded-xl"
                   >
-                    Cancel
+                    Cancel Changes
                   </Button>
                   <Button
                     type="submit"
-                    disabled={updateAttendanceMutation.isPending}
+                    disabled={updateAttendanceMutation.isPending || createAttendanceMutation.isPending}
+                    className="w-full sm:w-auto h-12 bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 shadow-lg hover:shadow-xl transition-all duration-200 font-semibold rounded-xl"
                   >
-                    {updateAttendanceMutation.isPending ? "Saving..." : "Save Changes"}
+                    {(updateAttendanceMutation.isPending || createAttendanceMutation.isPending) ? (
+                      <>
+                        <Loader2 className="mr-3 h-5 w-5 animate-spin" />
+                        Saving...
+                      </>
+                    ) : (
+                      <>
+                        <CheckSquare className="mr-3 h-5 w-5" />
+                        {editingRecord?.id === null || editingRecord?.id === 0 ? 'Create Record' : 'Save Changes'}
+                      </>
+                    )}
                   </Button>
-                </DialogFooter>
+                </div>
               </form>
             </Form>
           </DialogContent>
